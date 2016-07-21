@@ -6,14 +6,16 @@ import fetchList from '../actions/fetchList';
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: '#F5FCFF'
     },
     welcome: {
         fontSize: 17,
-        marginTop: 20,
-        marginBottom: 10
+        marginTop: 25,
+        marginBottom: 10,
+        textAlign: 'center'
+    },
+    list: {
+        backgroundColor: '#fff'
     },
     separator: {
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
@@ -21,10 +23,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
     },
     listItem: {
-        fontSize: 12,
-        borderWidth: 1,
-        padding: 5,
-        flexDirection: 'row',
+        padding: 10
+    },
+    listItemText: {
+        fontSize: 12
     }
 });
 
@@ -61,6 +63,14 @@ export default class SimpleList extends Component {
         );
     }
 
+    _renderRow(rowData) {
+        return (
+            <View style={styles.listItem}>
+                <Text style={styles.listItemText}>{rowData}</Text>
+            </View>
+        );
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -71,7 +81,8 @@ export default class SimpleList extends Component {
                     dataSource={this.state.dataSource}
                     automaticallyAdjustContentInsets={false}
                     renderSeparator={this._renderSeparator}
-                    renderRow={(rowData) => <Text style={styles.listItem}>{rowData}</Text>}
+                    renderRow={this._renderRow}
+                    style={styles.list}
                 />
             </View>
         );
