@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { StyleSheet, Text, View, ListView } from 'react-native';
 import { connect } from 'react-redux';
 import fetchList from '../actions/fetchList';
+import MapView from 'react-native-maps';
 
 const styles = StyleSheet.create({
     container: {
@@ -15,7 +16,19 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     list: {
+        flex: 1,
         backgroundColor: '#fff'
+    },
+    mapContainer: {
+        flex: 2,
+    },
+    map: {
+        backgroundColor: '#f00',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
     },
     separator: {
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
@@ -36,6 +49,7 @@ export default class SimpleList extends Component {
         const dataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
         this.state = {
+            items: [],
             dataSource
         }
     }
@@ -66,8 +80,18 @@ export default class SimpleList extends Component {
     _renderRow(rowData) {
         return (
             <View style={styles.listItem}>
-                <Text style={styles.listItemText}>{rowData}</Text>
+                <Text style={styles.listItemText}>{rowData.title}</Text>
             </View>
+        );
+    }
+
+    _renderMarker(rowData, idx) {
+        return (
+            <MapView.Marker
+                key={`map-marker-${idx}`}
+                coordinate={rowData}
+                title={rowData.title}
+            />
         );
     }
 
@@ -77,6 +101,19 @@ export default class SimpleList extends Component {
                 <Text style={styles.welcome}>
                     Welcome to SimpleListApp!
                 </Text>
+                <View style={styles.mapContainer}>
+                    <MapView
+                        initialRegion={{
+                            latitude: 52.22977,
+                            longitude: 21.0117800,
+                            latitudeDelta: 0.1,
+                            longitudeDelta: 0.1,
+                        }}
+                        style={styles.map}
+                    >
+                        {this.state.items.map(this._renderMarker)}
+                    </MapView>
+                </View>
                 <ListView
                     dataSource={this.state.dataSource}
                     automaticallyAdjustContentInsets={false}

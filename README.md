@@ -3,12 +3,13 @@ This is simple boilerplate integrating ReactNative ListView with Redux
 
 ## Installation
 
-Install NodeJS v6, XCode and React Native CLI.
+Install NodeJS v6, XCode and React Native CLI and rnpm.
 
-Install project dependencies:
+Install and link project dependencies:
 
 ```sh
 $ npm install
+$ rnpm link
 ```
 
 ## Running the App on iOS Simulator
