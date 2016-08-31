@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ListView } from 'react-native';
 import { connect } from 'react-redux';
 import fetchList from '../actions/fetchList';
 import MapView from 'react-native-maps';
+import { debounce } from 'lodash';
 
 const styles = StyleSheet.create({
     container: {
@@ -50,7 +51,13 @@ export default class SimpleList extends Component {
 
         this.state = {
             items: [],
-            dataSource
+            dataSource,
+            region: {
+                latitude: 52.22977,
+                longitude: 21.0117800,
+                latitudeDelta: 0.1,
+                longitudeDelta: 0.1,
+            }
         }
     }
 
@@ -68,12 +75,8 @@ export default class SimpleList extends Component {
     }
 
     _renderSeparator(sectionId, rowId, adjacentRowHighlighted) {
-        // var style = styles.rowSeparator;
-        // if (adjacentRowHighlighted) {
-        //     style = [style, styles.rowSeparatorHide];
-        // }
         return (
-          <View key={"SEP_" + sectionId + "_" + rowId}  style={styles.separator}/>
+            <View key={"SEP_" + sectionId + "_" + rowId}  style={styles.separator}/>
         );
     }
 
@@ -95,6 +98,11 @@ export default class SimpleList extends Component {
         );
     }
 
+    _onRegionChange = (region) => {
+        this.setState({ region });
+        this.props.dispatch(fetchList(region));
+    };
+
     render() {
         return (
             <View style={styles.container}>
@@ -103,12 +111,8 @@ export default class SimpleList extends Component {
                 </Text>
                 <View style={styles.mapContainer}>
                     <MapView
-                        initialRegion={{
-                            latitude: 52.22977,
-                            longitude: 21.0117800,
-                            latitudeDelta: 0.1,
-                            longitudeDelta: 0.1,
-                        }}
+                        region={this.state.region}
+                        onRegionChange={debounce(this._onRegionChange, 300)}
                         style={styles.map}
                     >
                         {this.state.items.map(this._renderMarker)}

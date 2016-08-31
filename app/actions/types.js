@@ -1,1 +1,5 @@
-export const FETCH_LIST = 'FETCH_LIST';
+export const FETCH_LIST = {
+    START: 'FETCH_LIST_START',
+    SUCCESS: 'FETCH_LIST_SUCCESS',
+    ERROR: 'FETCH_LIST_ERROR'
+};

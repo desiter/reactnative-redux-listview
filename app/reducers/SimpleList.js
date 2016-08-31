@@ -5,11 +5,16 @@ const initialState = {
 };
 
 export default function SimpleList(state = initialState, action = {}) {
-    console.log('action', action.type, action.items);
     switch(action.type) {
-        case types.FETCH_LIST:
+        case types.FETCH_LIST.START:
             return {
                 ...state,
+                loading: true
+            };
+        case types.FETCH_LIST.SUCCESS:
+            return {
+                ...state,
+                loading: false,
                 items: action.items
             };
         default:
