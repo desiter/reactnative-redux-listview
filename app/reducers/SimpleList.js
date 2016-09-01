@@ -15,7 +15,13 @@ export default function SimpleList(state = initialState, action = {}) {
             return {
                 ...state,
                 loading: false,
-                items: action.items
+                items: action.payload
+            };
+        case types.FETCH_LIST.ERROR:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
             };
         default:
             return state;

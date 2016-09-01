@@ -5,6 +5,13 @@ import fetchList from '../actions/fetchList';
 import MapView from 'react-native-maps';
 import { debounce } from 'lodash';
 
+const INITIAL_REGION = {
+    latitude: 52.22977,
+    longitude: 21.0117800,
+    latitudeDelta: 0.1,
+    longitudeDelta: 0.1,
+};
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -15,6 +22,12 @@ const styles = StyleSheet.create({
         marginTop: 25,
         marginBottom: 10,
         textAlign: 'center'
+    },
+    error: {
+        flex: 1,
+        backgroundColor: 'red',
+        color: '#fff',
+        padding: 10
     },
     list: {
         flex: 1,
@@ -30,6 +43,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
+        borderWidth: 1
     },
     separator: {
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
@@ -51,13 +65,9 @@ export default class SimpleList extends Component {
 
         this.state = {
             items: [],
+            error: null,
             dataSource,
-            region: {
-                latitude: 52.22977,
-                longitude: 21.0117800,
-                latitudeDelta: 0.1,
-                longitudeDelta: 0.1,
-            }
+            region: INITIAL_REGION
         }
     }
 
@@ -68,10 +78,17 @@ export default class SimpleList extends Component {
                 dataSource: this.state.dataSource.cloneWithRows(nextProps.items)
             });
         }
+
+        if (nextProps.error !== this.state.error) {
+            this.setState({
+                error: nextProps.error,
+                items: []
+            });
+        }
     }
 
     componentDidMount() {
-        this.props.dispatch(fetchList());
+        this.props.dispatch(fetchList(this.state.region));
     }
 
     _renderSeparator(sectionId, rowId, adjacentRowHighlighted) {
@@ -98,6 +115,27 @@ export default class SimpleList extends Component {
         );
     }
 
+    _renderList() {
+        if (this.state.error) {
+            console.log(this.state.error);
+            return (
+                <Text style={styles.error}>
+                    { this.state.error.toString() }
+                </Text>
+            );
+        }
+        return (
+            <ListView
+                dataSource={this.state.dataSource}
+                automaticallyAdjustContentInsets={false}
+                enableEmptySections
+                renderSeparator={this._renderSeparator}
+                renderRow={this._renderRow}
+                style={styles.list}
+            />
+        );
+    }
+
     _onRegionChange = (region) => {
         this.setState({ region });
         this.props.dispatch(fetchList(region));
@@ -118,13 +156,7 @@ export default class SimpleList extends Component {
                         {this.state.items.map(this._renderMarker)}
                     </MapView>
                 </View>
-                <ListView
-                    dataSource={this.state.dataSource}
-                    automaticallyAdjustContentInsets={false}
-                    renderSeparator={this._renderSeparator}
-                    renderRow={this._renderRow}
-                    style={styles.list}
-                />
+                {this._renderList()}
             </View>
         );
     }
@@ -132,17 +164,20 @@ export default class SimpleList extends Component {
 
 SimpleList.propTypes = {
     items: PropTypes.array,
+    error: PropTypes.object,
     dispatch: PropTypes.func
 };
 
 SimpleList.defaultProps = {
     items: [],
+    error: null,
     dispatch() {}
 };
 
 function select(state) {
     return {
-        items: state.SimpleList.items
+        items: state.SimpleList.items,
+        error: state.SimpleList.error
     };
 }
 
