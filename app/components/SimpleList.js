@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { StyleSheet, Text, View, ListView } from 'react-native';
+import { StyleSheet, Text, View, ListView, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import fetchList from '../actions/fetchList';
 import MapView from 'react-native-maps';
@@ -29,6 +29,14 @@ const styles = StyleSheet.create({
         color: '#fff',
         padding: 10
     },
+    search: {
+        height: 40,
+        padding: 10
+    },
+    listContainer: {
+        flex: 1,
+        backgroundColor: '#fff'
+    },
     list: {
         flex: 1,
         backgroundColor: '#fff'
@@ -42,8 +50,7 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         right: 0,
-        bottom: 0,
-        borderWidth: 1
+        bottom: 0
     },
     separator: {
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
@@ -125,21 +132,38 @@ export default class SimpleList extends Component {
             );
         }
         return (
-            <ListView
-                dataSource={this.state.dataSource}
-                automaticallyAdjustContentInsets={false}
-                enableEmptySections
-                renderSeparator={this._renderSeparator}
-                renderRow={this._renderRow}
-                style={styles.list}
-            />
+            <View style={styles.listContainer}>
+                <TextInput
+                    placeholder="Search Coffee Shops"
+                    style={styles.search}
+                    onChangeText={this._onSearch}
+                    value={this.state.query}
+                />
+                <ListView
+                    dataSource={this.state.dataSource}
+                    automaticallyAdjustContentInsets={false}
+                    enableEmptySections
+                    renderSeparator={this._renderSeparator}
+                    renderRow={this._renderRow}
+                    style={styles.list}
+                />
+            </View>
         );
     }
 
     _onRegionChange = (region) => {
         this.setState({ region });
-        this.props.dispatch(fetchList(region));
+        this._fetchList();
     };
+
+    _onSearch = (query) => {
+        this.setState({ query });
+        this._fetchList();
+    };
+
+    _fetchList = debounce(() => {
+        this.props.dispatch(fetchList(this.state.region, this.state.query));
+    }, 300);
 
     render() {
         return (
@@ -150,7 +174,7 @@ export default class SimpleList extends Component {
                 <View style={styles.mapContainer}>
                     <MapView
                         region={this.state.region}
-                        onRegionChange={debounce(this._onRegionChange, 300)}
+                        onRegionChange={this._onRegionChange}
                         style={styles.map}
                     >
                         {this.state.items.map(this._renderMarker)}

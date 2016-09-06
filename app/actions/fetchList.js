@@ -5,19 +5,20 @@ import parseResponse from '../helpers/parseResponse';
 const CLIENT_ID = '5BFD4R5BH10S0HVQEF4SONIRIDTSAL35TIODO5BJ5FH5AWXO';
 const CLIENT_SECRET = '1EEDWNTH2CHHATIDE0TD4DKDKXUWHXK05UG4JURUDGCCATSK';
 
-export default function fetchList(region) {
+export default function fetchList(region, query) {
     return dispatch => {
         dispatch({ type: types.FETCH_LIST.START });
         const swLatitude = region.latitude - (region.latitudeDelta / 2);
         const swLongitude = region.longitude - (region.longitudeDelta / 2);
         const neLatitude = region.latitude + (region.latitudeDelta / 2);
         const neLongitude = region.longitude + (region.longitudeDelta / 2);
+        const search = query ? `&query=${query}` : '';
         fetch('https://api.foursquare.com/v2/venues/search' +
             `?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}` +
             `&v=20130815&intent=browse&limit=50` +
             `&sw=${swLatitude},${swLongitude}` +
             `&ne=${neLatitude},${neLongitude}` +
-            `&query=coffee`)
+            `&categoryId=4bf58dd8d48988d1e0931735${search}`)
             .then(parseResponse)
             .then(response => {
                 const payload = get(response, 'response.venues', [])
