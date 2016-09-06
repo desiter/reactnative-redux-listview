@@ -137,6 +137,7 @@ export default class SimpleList extends Component {
                     placeholder="Search Coffee Shops"
                     style={styles.search}
                     onChangeText={this._onSearch}
+                    returnKeyType="search"
                     value={this.state.query}
                 />
                 <ListView
