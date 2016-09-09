@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ListView, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import fetchList from '../actions/fetchList';
 import MapView from 'react-native-maps';
-import { debounce } from 'lodash';
+import { debounce, clone } from 'lodash';
 
 const INITIAL_REGION = {
     latitude: 52.22977,
@@ -14,8 +14,7 @@ const INITIAL_REGION = {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#F5FCFF'
+        flex: 1
     },
     welcome: {
         fontSize: 17,
@@ -29,16 +28,24 @@ const styles = StyleSheet.create({
         color: '#fff',
         padding: 10
     },
+    listContainer: {
+        position: 'absolute',
+        top: 60,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex:1,
+    },
     search: {
         height: 40,
-        padding: 10
-    },
-    listContainer: {
-        flex: 1,
+        padding: 10,
+        margin: 5,
+        marginBottom: 0,
         backgroundColor: '#fff'
     },
     list: {
         flex: 1,
+        margin: 5,
         backgroundColor: '#fff'
     },
     mapContainer: {
@@ -122,6 +129,11 @@ export default class SimpleList extends Component {
         );
     }
 
+    _checkSearchFocus = () => {
+        //console.log('search focus', this.refs.search.isFocused());
+        this.setState({ listMode: this.refs.search.isFocused() });
+    }
+
     _renderList() {
         if (this.state.error) {
             console.log(this.state.error);
@@ -131,23 +143,31 @@ export default class SimpleList extends Component {
                 </Text>
             );
         }
+
+        const listView = this.state.listMode ? (
+            <ListView
+                dataSource={this.state.dataSource}
+                automaticallyAdjustContentInsets={false}
+                enableEmptySections
+                renderSeparator={this._renderSeparator}
+                renderRow={this._renderRow}
+                style={styles.list}
+            />
+        ) : null;
+
         return (
             <View style={styles.listContainer}>
                 <TextInput
+                    ref="search"
                     placeholder="Search Coffee Shops"
                     style={styles.search}
                     onChangeText={this._onSearch}
+                    onFocus={this._checkSearchFocus}
+                    onBlur={this._checkSearchFocus}
                     returnKeyType="search"
                     value={this.state.query}
                 />
-                <ListView
-                    dataSource={this.state.dataSource}
-                    automaticallyAdjustContentInsets={false}
-                    enableEmptySections
-                    renderSeparator={this._renderSeparator}
-                    renderRow={this._renderRow}
-                    style={styles.list}
-                />
+                {listView}
             </View>
         );
     }
@@ -172,6 +192,7 @@ export default class SimpleList extends Component {
                 <Text style={styles.welcome}>
                     Welcome to SimpleListApp!
                 </Text>
+                {this._renderList()}
                 <View style={styles.mapContainer}>
                     <MapView
                         region={this.state.region}
@@ -181,7 +202,6 @@ export default class SimpleList extends Component {
                         {this.state.items.map(this._renderMarker)}
                     </MapView>
                 </View>
-                {this._renderList()}
             </View>
         );
     }
