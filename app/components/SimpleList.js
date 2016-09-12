@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { StyleSheet, Text, View, ListView, TextInput } from 'react-native';
 import { connect } from 'react-redux';
-import fetchList from '../actions/fetchList';
+import { fetchList, getLocation } from '../actions';
 import MapView from 'react-native-maps';
 import { debounce, clone } from 'lodash';
 
@@ -23,29 +23,30 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     error: {
-        flex: 1,
+        position: 'absolute',
         backgroundColor: 'red',
         color: '#fff',
-        padding: 10
-    },
-    listContainer: {
-        position: 'absolute',
-        top: 60,
-        left: 0,
-        right: 0,
         bottom: 0,
-        zIndex:1,
+        left: 0,
+        right: 0
     },
     search: {
+        position: 'absolute',
+        top: 20,
+        left: 5,
+        right: 5,
         height: 40,
         padding: 10,
-        margin: 5,
-        marginBottom: 0,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
+        zIndex:1,
     },
     list: {
-        flex: 1,
-        margin: 5,
+        position: 'absolute',
+        top: 60,
+        left: 5,
+        right: 5,
+        bottom: 5,
+        zIndex:1,
         backgroundColor: '#fff'
     },
     mapContainer: {
@@ -81,7 +82,8 @@ export default class SimpleList extends Component {
             items: [],
             error: null,
             dataSource,
-            region: INITIAL_REGION
+            region: INITIAL_REGION,
+            location: null
         }
     }
 
@@ -95,14 +97,27 @@ export default class SimpleList extends Component {
 
         if (nextProps.error !== this.state.error) {
             this.setState({
-                error: nextProps.error,
-                items: []
+                error: nextProps.error
+            });
+        }
+
+        if (nextProps.location !== this.state.location) {
+            this.setState(prevState => {
+                prevState.location = nextProps.location;
+                prevState.region.latitude = nextProps.location.latitude;
+                prevState.region.longitude = nextProps.location.longitude;
+                return prevState;
             });
         }
     }
 
     componentDidMount() {
         this.props.dispatch(fetchList(this.state.region));
+        this._getCurrentLocation();
+    }
+
+    _getCurrentLocation = () => {
+        this.props.dispatch(getLocation());
     }
 
     _renderSeparator(sectionId, rowId, adjacentRowHighlighted) {
@@ -134,17 +149,16 @@ export default class SimpleList extends Component {
         this.setState({ listMode: this.refs.search.isFocused() });
     }
 
-    _renderList() {
-        if (this.state.error) {
-            console.log(this.state.error);
-            return (
-                <Text style={styles.error}>
-                    { this.state.error.toString() }
-                </Text>
-            );
-        }
+    _renderError() {
+        return this.state.error ? (
+            <Text style={styles.error}>
+                { this.state.error.toString() }
+            </Text>
+        ) : null;
+    }
 
-        const listView = this.state.listMode ? (
+    _renderList() {
+        return this.state.listMode ? (
             <ListView
                 dataSource={this.state.dataSource}
                 automaticallyAdjustContentInsets={false}
@@ -154,22 +168,6 @@ export default class SimpleList extends Component {
                 style={styles.list}
             />
         ) : null;
-
-        return (
-            <View style={styles.listContainer}>
-                <TextInput
-                    ref="search"
-                    placeholder="Search Coffee Shops"
-                    style={styles.search}
-                    onChangeText={this._onSearch}
-                    onFocus={this._checkSearchFocus}
-                    onBlur={this._checkSearchFocus}
-                    returnKeyType="search"
-                    value={this.state.query}
-                />
-                {listView}
-            </View>
-        );
     }
 
     _onRegionChange = (region) => {
@@ -189,10 +187,16 @@ export default class SimpleList extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.welcome}>
-                    Welcome to SimpleListApp!
-                </Text>
-                {this._renderList()}
+                <TextInput
+                    ref="search"
+                    placeholder="Search Coffee Shops"
+                    style={styles.search}
+                    onChangeText={this._onSearch}
+                    onFocus={this._checkSearchFocus}
+                    onBlur={this._checkSearchFocus}
+                    returnKeyType="search"
+                    value={this.state.query}
+                />
                 <View style={styles.mapContainer}>
                     <MapView
                         region={this.state.region}
@@ -202,6 +206,8 @@ export default class SimpleList extends Component {
                         {this.state.items.map(this._renderMarker)}
                     </MapView>
                 </View>
+                {this._renderList()}
+                {this._renderError()}
             </View>
         );
     }
@@ -216,14 +222,12 @@ SimpleList.propTypes = {
 SimpleList.defaultProps = {
     items: [],
     error: null,
+    location: null,
     dispatch() {}
 };
 
 function select(state) {
-    return {
-        items: state.SimpleList.items,
-        error: state.SimpleList.error
-    };
+    return state.SimpleList;
 }
 
 export default connect(select)(SimpleList);

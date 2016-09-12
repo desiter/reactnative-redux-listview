@@ -1,7 +1,9 @@
 import * as types from '../actions/types';
+import { get } from 'lodash';
 
 const initialState = {
-    items: []
+    items: [],
+    location: null
 };
 
 export default function SimpleList(state = initialState, action = {}) {
@@ -20,7 +22,26 @@ export default function SimpleList(state = initialState, action = {}) {
         case types.FETCH_LIST.ERROR:
             return {
                 ...state,
+                list: [],
                 loading: false,
+                error: action.payload
+            };
+        case types.GET_LOCATION.START:
+            return {
+                ...state,
+                loading: true
+            };
+        case types.GET_LOCATION.SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                location: get(action, 'payload.coords')
+            };
+        case types.GET_LOCATION.ERROR:
+            return {
+                ...state,
+                loading: false,
+                location: null,
                 error: action.payload
             };
         default:
