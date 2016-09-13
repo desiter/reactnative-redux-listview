@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { fetchList, getLocation } from '../actions';
 import MapView from 'react-native-maps';
 import { debounce, clone } from 'lodash';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const INITIAL_REGION = {
     latitude: 52.22977,
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0
     },
-    search: {
+    searchContainer: {
         position: 'absolute',
         top: 20,
         left: 5,
@@ -39,6 +40,19 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
         zIndex:1,
+    },
+    searchExit: {
+        position: 'absolute',
+        left: 10,
+        top: 10
+    },
+    search: {
+        position: 'absolute',
+        left: 40,
+        top: 10,
+        right: 10,
+        height: 20,
+        fontSize: 17
     },
     list: {
         position: 'absolute',
@@ -187,16 +201,21 @@ export default class SimpleList extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <TextInput
-                    ref="search"
-                    placeholder="Search Coffee Shops"
-                    style={styles.search}
-                    onChangeText={this._onSearch}
-                    onFocus={this._checkSearchFocus}
-                    onBlur={this._checkSearchFocus}
-                    returnKeyType="search"
-                    value={this.state.query}
-                />
+                <View style={styles.searchContainer}>
+                    <Icon name="md-arrow-back"
+                        onPress={() => this.refs.search.blur() }
+                        style={styles.searchExit} size={20} color="#000" />
+                    <TextInput
+                        ref="search"
+                        placeholder="Search Coffee Shops"
+                        style={styles.search}
+                        onChangeText={this._onSearch}
+                        onFocus={this._checkSearchFocus}
+                        onBlur={this._checkSearchFocus}
+                        returnKeyType="search"
+                        value={this.state.query}
+                    />
+                </View>
                 <View style={styles.mapContainer}>
                     <MapView
                         region={this.state.region}
