@@ -1,5 +1,5 @@
-import SimpleList from './SimpleList';
+import MapList from './MapList';
 
 export {
-    SimpleList
+    MapList
 };
