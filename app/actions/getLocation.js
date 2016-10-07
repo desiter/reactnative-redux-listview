@@ -1,6 +1,5 @@
 import * as types from './types';
 import { delay, get } from 'lodash';
-import parseResponse from '../helpers/parseResponse';
 
 export default function getLocation() {
     return dispatch => {

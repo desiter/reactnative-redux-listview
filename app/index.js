@@ -5,7 +5,7 @@ import thunk from 'redux-thunk';
 import logger from 'redux-logger';
 
 import * as reducers from './reducers';
-import SimpleList from './components/SimpleList';
+import MapList from './components/MapList';
 
 const createStoreWithMiddleware = applyMiddleware(thunk, logger())(createStore);
 const reducer = combineReducers(reducers);
@@ -15,7 +15,7 @@ export default class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <SimpleList />
+        <MapList />
       </Provider>
     );
   }

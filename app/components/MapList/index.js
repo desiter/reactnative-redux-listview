@@ -1,10 +1,12 @@
 import React, { Component, PropTypes } from 'react';
-import { StyleSheet, Text, View, ListView, TextInput } from 'react-native';
+import { Text, View, ListView, TextInput } from 'react-native';
 import { connect } from 'react-redux';
-import { fetchList, getLocation } from '../actions';
+import { fetchList, getLocation } from '../../actions';
 import MapView from 'react-native-maps';
-import { debounce, clone } from 'lodash';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { debounce, clone, get } from 'lodash';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import ListItem from '../ListItem';
+import styles from './styles.js';
 
 const INITIAL_REGION = {
     latitude: 52.22977,
@@ -13,81 +15,7 @@ const INITIAL_REGION = {
     longitudeDelta: 0.1,
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-    welcome: {
-        fontSize: 17,
-        marginTop: 25,
-        marginBottom: 10,
-        textAlign: 'center'
-    },
-    error: {
-        position: 'absolute',
-        backgroundColor: 'red',
-        color: '#fff',
-        bottom: 0,
-        left: 0,
-        right: 0
-    },
-    searchContainer: {
-        position: 'absolute',
-        top: 20,
-        left: 5,
-        right: 5,
-        height: 40,
-        padding: 10,
-        backgroundColor: '#fff',
-        zIndex:1,
-    },
-    searchExit: {
-        position: 'absolute',
-        left: 10,
-        top: 10
-    },
-    search: {
-        position: 'absolute',
-        left: 40,
-        top: 10,
-        right: 10,
-        height: 20,
-        fontSize: 17
-    },
-    list: {
-        position: 'absolute',
-        top: 60,
-        left: 5,
-        right: 5,
-        bottom: 5,
-        zIndex:1,
-        backgroundColor: '#fff'
-    },
-    mapContainer: {
-        flex: 2,
-    },
-    map: {
-        backgroundColor: '#f00',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
-    },
-    separator: {
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
-        height: 1,
-        marginHorizontal: 10,
-    },
-    listItem: {
-        padding: 10
-    },
-    listItemText: {
-        fontSize: 12
-    }
-});
-
-export default class SimpleList extends Component {
+export default class MapList extends Component {
     constructor(props) {
         super(props);
         const dataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -120,6 +48,7 @@ export default class SimpleList extends Component {
                 prevState.location = nextProps.location;
                 prevState.region.latitude = nextProps.location.latitude;
                 prevState.region.longitude = nextProps.location.longitude;
+                this.props.dispatch(fetchList(this.state.region));
                 return prevState;
             });
         }
@@ -142,18 +71,20 @@ export default class SimpleList extends Component {
 
     _renderRow(rowData) {
         return (
-            <View style={styles.listItem}>
-                <Text style={styles.listItemText}>{rowData.title}</Text>
-            </View>
+            <ListItem data={rowData} />
         );
     }
 
     _renderMarker(rowData, idx) {
+        const coordinate = {
+            latitude: get(rowData, 'location.lat'),
+            longitude: get(rowData, 'location.lng')
+        };
         return (
             <MapView.Marker
                 key={`map-marker-${idx}`}
-                coordinate={rowData}
-                title={rowData.title}
+                coordinate={coordinate}
+                title={rowData.name}
             />
         );
     }
@@ -202,7 +133,7 @@ export default class SimpleList extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.searchContainer}>
-                    <Icon name="md-arrow-back"
+                    <Icon name="arrow-back"
                         onPress={() => this.refs.search.blur() }
                         style={styles.searchExit} size={20} color="#000" />
                     <TextInput
@@ -225,6 +156,12 @@ export default class SimpleList extends Component {
                         {this.state.items.map(this._renderMarker)}
                     </MapView>
                 </View>
+                <View style={styles.currentLocation}>
+                    <Icon name="location-searching"
+                        onPress={this._getCurrentLocation}
+                        size={20} color="#000" />
+                </View>
+
                 {this._renderList()}
                 {this._renderError()}
             </View>
@@ -232,13 +169,13 @@ export default class SimpleList extends Component {
     }
 }
 
-SimpleList.propTypes = {
+MapList.propTypes = {
     items: PropTypes.array,
     error: PropTypes.object,
     dispatch: PropTypes.func
 };
 
-SimpleList.defaultProps = {
+MapList.defaultProps = {
     items: [],
     error: null,
     location: null,
@@ -246,7 +183,7 @@ SimpleList.defaultProps = {
 };
 
 function select(state) {
-    return state.SimpleList;
+    return state.MapList;
 }
 
-export default connect(select)(SimpleList);
+export default connect(select)(MapList);
