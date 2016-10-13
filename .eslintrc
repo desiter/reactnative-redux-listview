@@ -1,0 +1,17 @@
+{
+  "extends": ["airbnb", "plugin:react/recommended"],
+  "plugins": [
+    "react",
+    "react-native"
+  ],
+  "globals": {
+    "fetch": false
+  },
+  "rules": {
+    "indent": [2, 4, {"SwitchCase": 1}],
+    "comma-dangle": [1, "always-multiline"]
+  },
+  "ecmaFeatures": {
+    "jsx": true
+  }
+}
