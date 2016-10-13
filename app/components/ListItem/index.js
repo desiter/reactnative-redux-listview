@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, TouchableHighlight } from 'react-native';
 import { getVenuePhotos, makePhotoUrl } from '../../services/foursquare';
+import VenueHeader from '../common/VenueHeader';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles.js';
 
@@ -22,31 +23,13 @@ export default class ListItem extends Component {
                 }
             });
     }
-
-    renderImage() {
-        return this.state.photoUrl ?
-            (
-                <Image style={styles.imagePlaceholder} source={{ uri: this.state.photoUrl }} />
-            ) :
-            (
-                <View style={styles.imagePlaceholder} />
-            );
-    }
-
     render() {
-        const { name, location, distance } = this.props.data;
+        const data = this.props.data;
+        const { name, location, distance } = data;
         return (
-            <View style={styles.listItem}>
-                {this.renderImage()}
-                <View style={styles.distanceContainer}>
-                    <Icon name="location-on" style={styles.distanceText} />
-                    <Text style={styles.distanceText}>{distance}m</Text>
-                </View>
-                <View style={styles.details}>
-                    <Text style={styles.listItemTitle}>{name}</Text>
-                    <Text style={styles.listItemDescription}>{location.address}, {location.city}</Text>
-                </View>
-            </View>
+            <TouchableHighlight style={styles.listItem} onPress={() => this.props.onPress(data)}>
+                <VenueHeader data={data} photoUrl={this.state.photoUrl} />
+            </TouchableHighlight>
         );
     }
 }
@@ -57,5 +40,6 @@ ListItem.propTypes = {
 };
 
 ListItem.defaultProps = {
-    data: { name: 'Untitled' }
+    data: { name: 'Untitled' },
+    onPress: () => { }
 };

@@ -1,3 +1,3 @@
 export default function makePhotoUrl(photo, size) {
-    return `${photo.prefix}${size}${photo.suffix}`;
+    return photo ? `${photo.prefix}${size}${photo.suffix}` : null;
 }

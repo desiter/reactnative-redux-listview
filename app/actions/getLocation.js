@@ -5,9 +5,9 @@ export default function getLocation() {
     return dispatch => {
         dispatch({ type: types.GET_LOCATION.START });
         navigator.geolocation.getCurrentPosition(
-            payload => {
-                console.log('current location', payload);
-                dispatch({ type: types.GET_LOCATION.SUCCESS, payload });
+            data => {
+                console.log('current location', data);
+                dispatch({ type: types.GET_LOCATION.SUCCESS, payload: data.coords });
             },
             error => {
                 console.log('location error', error);

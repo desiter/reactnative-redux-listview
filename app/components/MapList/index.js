@@ -1,19 +1,14 @@
 import React, { Component, PropTypes } from 'react';
-import { Text, View, ListView, TextInput } from 'react-native';
+import { Text, View, ListView, TextInput, TouchableWithoutFeedback } from 'react-native';
+import dismissKeyboard from 'dismissKeyboard';
 import { connect } from 'react-redux';
-import { fetchList, getLocation } from '../../actions';
+import { fetchList, getLocation, setLocation } from '../../actions';
 import MapView from 'react-native-maps';
-import { debounce, clone, get } from 'lodash';
+import { debounce, clone, get, assign } from 'lodash';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ListItem from '../ListItem';
+import Details from '../Details';
 import styles from './styles.js';
-
-const INITIAL_REGION = {
-    latitude: 52.22977,
-    longitude: 21.0117800,
-    latitudeDelta: 0.1,
-    longitudeDelta: 0.1,
-};
 
 export default class MapList extends Component {
     constructor(props) {
@@ -22,14 +17,15 @@ export default class MapList extends Component {
 
         this.state = {
             items: [],
+            activeItemId: null,
             error: null,
             dataSource,
-            region: INITIAL_REGION,
             location: null
         }
     }
 
     componentWillUpdate(nextProps, nextState) {
+        console.log('update', nextProps);
         if (nextProps.items !== this.state.items) {
             this.setState({
                 items: nextProps.items,
@@ -46,16 +42,13 @@ export default class MapList extends Component {
         if (nextProps.location !== this.state.location) {
             this.setState(prevState => {
                 prevState.location = nextProps.location;
-                prevState.region.latitude = nextProps.location.latitude;
-                prevState.region.longitude = nextProps.location.longitude;
-                this.props.dispatch(fetchList(this.state.region));
+                this._fetchList();
                 return prevState;
             });
         }
     }
 
     componentDidMount() {
-        this.props.dispatch(fetchList(this.state.region));
         this._getCurrentLocation();
     }
 
@@ -69,10 +62,59 @@ export default class MapList extends Component {
         );
     }
 
-    _renderRow(rowData) {
+    _renderRow = (rowData) => {
         return (
-            <ListItem data={rowData} />
+            <ListItem data={rowData} onPress={this._onItemPress} />
         );
+    }
+
+    _onItemPress = (item) => {
+        this.setState({ activeItemId: item.id });
+    }
+
+    _onItemClose = () => {
+        this.setState({ activeItemId: null });
+    }
+
+    _onRegionChange = location => {
+        this.setState({ location });
+        this.props.dispatch(setLocation(location));
+    }
+
+    _renderSearch() {
+        return (
+            <View style={styles.searchContainer}>
+                {this.state.listMode ? (
+                    <Icon name="arrow-back" style={styles.searchIcon} onPress={this._closeList}/>
+                ) : (
+                    <Icon name="menu"  style={styles.searchIcon}/>
+                )}
+                <TextInput
+                    ref="search"
+                    placeholder="Search Coffee Shops"
+                    style={styles.search}
+                    onChangeText={this._onSearch}
+                    onFocus={this._openList}
+                    // onBlur={this._checkSearchFocus}
+                    returnKeyType="search"
+                    value={this.state.query}
+                />
+            </View>
+        )
+    }
+
+    _renderMap() {
+        return this.state.location ? (
+            <View style={styles.mapContainer}>
+                <MapView
+                    region={this.state.location}
+                    onRegionChange={this._onRegionChange}
+                    style={styles.map}
+                >
+                    {this.state.items.map(this._renderMarker)}
+                </MapView>
+            </View>
+        ) : null;
     }
 
     _renderMarker(rowData, idx) {
@@ -80,18 +122,27 @@ export default class MapList extends Component {
             latitude: get(rowData, 'location.lat'),
             longitude: get(rowData, 'location.lng')
         };
+        const { location } = rowData;
         return (
             <MapView.Marker
                 key={`map-marker-${idx}`}
                 coordinate={coordinate}
+                identified={rowData.id}
                 title={rowData.name}
+                description={`${location.address}, ${location.city}`}
             />
+            // @todo use custom callout view
         );
     }
 
-    _checkSearchFocus = () => {
-        //console.log('search focus', this.refs.search.isFocused());
-        this.setState({ listMode: this.refs.search.isFocused() });
+    _openList = () => {
+        this.setState({ listMode: true });
+    }
+
+    _closeList = () => {
+        this.setState({ listMode: false });
+        this.refs.search.clear();
+        dismissKeyboard();
     }
 
     _renderError() {
@@ -115,10 +166,13 @@ export default class MapList extends Component {
         ) : null;
     }
 
-    _onRegionChange = (region) => {
-        this.setState({ region });
-        this._fetchList();
-    };
+    _renderDetails() {
+        console.log('render details' ,this.state.detailsData);
+        return this.state.activeItemId ? (
+            <Details style={styles.details} itemId={this.state.activeItemId}
+                onClose={this._onItemClose} />
+        ) : null;
+    }
 
     _onSearch = (query) => {
         this.setState({ query });
@@ -126,51 +180,32 @@ export default class MapList extends Component {
     };
 
     _fetchList = debounce(() => {
-        this.props.dispatch(fetchList(this.state.region, this.state.query));
+        this.props.dispatch(fetchList(this.state.location, this.state.query));
     }, 300);
 
     render() {
         return (
-            <View style={styles.container}>
-                <View style={styles.searchContainer}>
-                    <Icon name="arrow-back"
-                        onPress={() => this.refs.search.blur() }
-                        style={styles.searchExit} size={20} color="#000" />
-                    <TextInput
-                        ref="search"
-                        placeholder="Search Coffee Shops"
-                        style={styles.search}
-                        onChangeText={this._onSearch}
-                        onFocus={this._checkSearchFocus}
-                        onBlur={this._checkSearchFocus}
-                        returnKeyType="search"
-                        value={this.state.query}
-                    />
+            <TouchableWithoutFeedback onPress={dismissKeyboard}>
+                <View style={styles.container}>
+                    {this._renderSearch()}
+                    {this._renderMap()}
+                    <View style={styles.currentLocation}>
+                        <Icon name="location-searching"
+                            onPress={this._getCurrentLocation}
+                            size={20} color="#000" />
+                    </View>
+                    {this._renderList()}
+                    {this._renderDetails()}
+                    {this._renderError()}
                 </View>
-                <View style={styles.mapContainer}>
-                    <MapView
-                        region={this.state.region}
-                        onRegionChange={this._onRegionChange}
-                        style={styles.map}
-                    >
-                        {this.state.items.map(this._renderMarker)}
-                    </MapView>
-                </View>
-                <View style={styles.currentLocation}>
-                    <Icon name="location-searching"
-                        onPress={this._getCurrentLocation}
-                        size={20} color="#000" />
-                </View>
-
-                {this._renderList()}
-                {this._renderError()}
-            </View>
+            </TouchableWithoutFeedback>
         );
     }
 }
 
 MapList.propTypes = {
     items: PropTypes.array,
+    location: PropTypes.object,
     error: PropTypes.object,
     dispatch: PropTypes.func
 };
@@ -183,7 +218,7 @@ MapList.defaultProps = {
 };
 
 function select(state) {
-    return state.MapList;
+    return assign({}, state.MapList, { location: state.Location });
 }
 
 export default connect(select)(MapList);

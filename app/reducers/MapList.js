@@ -6,7 +6,7 @@ const initialState = {
     location: null
 };
 
-export default function SimpleList(state = initialState, action = {}) {
+export default function MapList(state = initialState, action = {}) {
     switch(action.type) {
         case types.FETCH_LIST.START:
             return {

@@ -27,17 +27,24 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
         zIndex:1,
+        shadowColor: '#000',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1
     },
-    searchExit: {
+    searchIcon: {
         position: 'absolute',
         left: 10,
-        top: 10
+        top: 10,
+        color: '#000',
+        fontSize: 20
     },
     search: {
         position: 'absolute',
         left: 40,
         top: 10,
         right: 10,
+        bottom: 10,
         height: 20,
         fontSize: 17
     },
@@ -48,7 +55,11 @@ const styles = StyleSheet.create({
         zIndex: 1,
         padding: 10,
         backgroundColor: '#fff',
-        borderRadius: 20
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1
     },
     list: {
         position: 'absolute',
@@ -57,6 +68,20 @@ const styles = StyleSheet.create({
         right: 5,
         bottom: 5,
         zIndex:2,
+        backgroundColor: '#fff',
+        shadowColor: '#000',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1
+    },
+    details: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex:3,
+        paddingTop: 20,
         backgroundColor: '#fff'
     },
     mapContainer: {
