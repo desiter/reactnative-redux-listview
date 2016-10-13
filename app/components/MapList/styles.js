@@ -2,13 +2,13 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
     },
     welcome: {
         fontSize: 17,
         marginTop: 25,
         marginBottom: 10,
-        textAlign: 'center'
+        textAlign: 'center',
     },
     error: {
         position: 'absolute',
@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         bottom: 0,
         left: 0,
-        right: 0
+        right: 0,
     },
     searchContainer: {
         position: 'absolute',
@@ -26,18 +26,18 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 10,
         backgroundColor: '#fff',
-        zIndex:1,
+        zIndex: 1,
         shadowColor: '#000',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 0.2,
-        shadowRadius: 1
+        shadowRadius: 1,
     },
     searchIcon: {
         position: 'absolute',
         left: 10,
         top: 10,
         color: '#000',
-        fontSize: 20
+        fontSize: 20,
     },
     search: {
         position: 'absolute',
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
         right: 10,
         bottom: 10,
         height: 20,
-        fontSize: 17
+        fontSize: 17,
     },
     currentLocation: {
         position: 'absolute',
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 0.2,
-        shadowRadius: 1
+        shadowRadius: 1,
     },
     list: {
         position: 'absolute',
@@ -67,12 +67,12 @@ const styles = StyleSheet.create({
         left: 5,
         right: 5,
         bottom: 5,
-        zIndex:2,
+        zIndex: 2,
         backgroundColor: '#fff',
         shadowColor: '#000',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 0.2,
-        shadowRadius: 1
+        shadowRadius: 1,
     },
     details: {
         position: 'absolute',
@@ -80,9 +80,9 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex:3,
+        zIndex: 3,
         paddingTop: 20,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
     },
     mapContainer: {
         flex: 2,
@@ -93,13 +93,13 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         right: 0,
-        bottom: 0
+        bottom: 0,
     },
     separator: {
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         height: 1,
         marginHorizontal: 10,
-    }
+    },
 
 });
 

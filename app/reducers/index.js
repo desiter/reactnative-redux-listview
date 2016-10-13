@@ -5,5 +5,5 @@ import Location from './Location';
 export {
     MapList,
     Details,
-    Location
+    Location,
 };

@@ -7,5 +7,5 @@ export {
     fetchList,
     fetchDetails,
     getLocation,
-    setLocation
+    setLocation,
 };

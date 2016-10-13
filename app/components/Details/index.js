@@ -1,21 +1,21 @@
 import React, { Component, PropTypes } from 'react';
 import { Text, View, Image, Dimensions, TouchableHighlight } from 'react-native';
 import { connect } from 'react-redux';
-import { makePhotoUrl } from '../../services/foursquare';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import styles from './styles.js';
+import { assign, get } from 'lodash';
+import { makePhotoUrl } from '../../services/foursquare';
+import styles from './styles';
 import VenueHeader from '../common/VenueHeader';
 import { fetchDetails } from '../../actions';
-import { assign, get } from 'lodash';
 
-export default class Details extends Component {
+export class Details extends Component {
     constructor() {
         super();
         this.state = {
             data: { },
             photos: [],
-            configMode: false
-        }
+            configMode: false,
+        };
     }
 
     componentWillMount() {
@@ -28,19 +28,18 @@ export default class Details extends Component {
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.itemId !== this.props.itemId) {
             this.props.dispatch(fetchDetails(nextProps.data.id, this.props.location));
-
         }
 
         if (nextProps.data !== this.props.data) {
             this.setState({
                 data: nextProps.data,
-                photos: get(nextProps, 'data.photos.groups[0].items', []).map(photo => makePhotoUrl(photo, 500))
+                photos: get(nextProps, 'data.photos.groups[0].items', []).map(photo => makePhotoUrl(photo, 500)),
             });
         }
 
         if (nextProps.error !== this.state.error) {
             this.setState({
-                error: nextProps.error
+                error: nextProps.error,
             });
         }
     }
@@ -52,7 +51,7 @@ export default class Details extends Component {
         return (
             <View style={this.props.style}>
                 <VenueHeader style={styles.header} data={this.state.data} photoUrl={this.state.photos[0]} />
-                <Icon name="arrow-back" style={styles.closeButton} onPress={() => this.props.onClose() } />
+                <Icon name="arrow-back" style={styles.closeButton} onPress={() => this.props.onClose()} />
                 <View style={styles.content}>
                     {photos.map((uri, idx) => (
                         <Image key={`venue-photo-${idx}`} style={styles.photo} source={{ uri }} width={imageWidth} />
@@ -69,7 +68,7 @@ Details.propTypes = {
     location: PropTypes.object,
     style: PropTypes.number,
     onClose: PropTypes.func,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
 };
 
 Details.defaultProps = {
@@ -77,7 +76,7 @@ Details.defaultProps = {
     data: {},
     location: {},
     onClose() {},
-    dispatch() {}
+    dispatch() {},
 };
 
 function select(state) {

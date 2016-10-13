@@ -8,11 +8,11 @@ const addressPadding = 5;
 
 const styles = StyleSheet.create({
     listItem: {
-        height: 150
+        height: 150,
     },
     listItemTitle: {
         fontSize: 14,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
     listItemDescription: {
 
@@ -35,12 +35,12 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 0.4,
-        shadowRadius: 1
+        shadowRadius: 1,
     },
     imagePlaceholder: {
         flex: 1,
-        height: height - 2*padding,
-        backgroundColor: '#581845'
+        height: height - 2 * padding,
+        backgroundColor: '#581845',
     },
     address: {
         position: 'absolute',
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
         bottom: 0,
         padding: addressPadding,
         zIndex: 1,
-        backgroundColor: 'rgba(255, 255, 255, 0.7)'
-    }
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    },
 });
 
 export default styles;

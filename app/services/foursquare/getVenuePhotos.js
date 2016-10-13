@@ -1,6 +1,6 @@
+import { get } from 'lodash';
 import parseResponse from './parseResponse';
 import { CLIENT_ID, CLIENT_SECRET } from './config';
-import { get } from 'lodash';
 
 export default function getVenuePhotos(id, limit = 3) {
     return fetch(`https://api.foursquare.com/v2/venues/${id}/photos` +

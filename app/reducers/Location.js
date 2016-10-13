@@ -1,19 +1,19 @@
+import { assign } from 'lodash';
 import * as types from '../actions/types';
-import { get, assign } from 'lodash';
 
 const initialState = {
     latitudeDelta: 0.1,
     longitudeDelta: 0.1,
     latitude: 52.22977,
-    longitude: 21.0117800
+    longitude: 21.0117800,
 };
 
 export default function MapList(state = initialState, action = {}) {
-    switch(action.type) {
+    switch (action.type) {
         case types.GET_LOCATION.START:
             return {
                 ...state,
-                loading: true
+                loading: true,
             };
         case types.GET_LOCATION.SUCCESS:
             return assign({
@@ -24,7 +24,7 @@ export default function MapList(state = initialState, action = {}) {
             return {
                 ...state,
                 loading: false,
-                error: action.payload
+                error: action.payload,
             };
         default:
             return state;

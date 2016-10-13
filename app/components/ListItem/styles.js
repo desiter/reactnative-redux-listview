@@ -6,8 +6,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginLeft: 5,
         marginRight: 5,
-        height: 150
-    }
+        height: 150,
+    },
 });
 
 export default styles;

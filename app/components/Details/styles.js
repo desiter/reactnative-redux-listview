@@ -42,12 +42,12 @@ const styles = StyleSheet.create({
         bottom: padding,
         zIndex: 5,
         backgroundColor: '#fff',
-        zIndex:1,
+        zIndex: 1,
         shadowColor: '#000',
         shadowOffset: { width: 2, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 5,
-    }
+    },
 });
 
 export default styles;

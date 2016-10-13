@@ -7,5 +7,5 @@ export {
     getVenuePhotos,
     makePhotoUrl,
     searchVenues,
-    parseResponse
-}
+    parseResponse,
+};

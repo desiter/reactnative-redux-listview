@@ -2,15 +2,15 @@ import React, { Component, PropTypes } from 'react';
 import { Text, View, ListView, TextInput, TouchableWithoutFeedback } from 'react-native';
 import dismissKeyboard from 'dismissKeyboard';
 import { connect } from 'react-redux';
-import { fetchList, getLocation, setLocation } from '../../actions';
 import MapView from 'react-native-maps';
-import { debounce, clone, get, assign } from 'lodash';
+import { debounce, get, assign } from 'lodash';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { fetchList, getLocation, setLocation } from '../../actions';
 import ListItem from '../ListItem';
 import Details from '../Details';
-import styles from './styles.js';
+import styles from './styles';
 
-export default class MapList extends Component {
+export class MapList extends Component {
     constructor(props) {
         super(props);
         const dataSource = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -20,30 +20,31 @@ export default class MapList extends Component {
             activeItemId: null,
             error: null,
             dataSource,
-            location: null
-        }
+            location: null,
+        };
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        console.log('update', nextProps);
+    componentWillUpdate(nextProps) {
         if (nextProps.items !== this.state.items) {
             this.setState({
                 items: nextProps.items,
-                dataSource: this.state.dataSource.cloneWithRows(nextProps.items)
+                dataSource: this.state.dataSource.cloneWithRows(nextProps.items),
             });
         }
 
         if (nextProps.error !== this.state.error) {
             this.setState({
-                error: nextProps.error
+                error: nextProps.error,
             });
         }
 
         if (nextProps.location !== this.state.location) {
-            this.setState(prevState => {
-                prevState.location = nextProps.location;
+            this.setState((prevState) => {
                 this._fetchList();
-                return prevState;
+                return {
+                    ...prevState,
+                    location: nextProps.location,
+                };
             });
         }
     }
@@ -58,7 +59,7 @@ export default class MapList extends Component {
 
     _renderSeparator(sectionId, rowId, adjacentRowHighlighted) {
         return (
-            <View key={"SEP_" + sectionId + "_" + rowId}  style={styles.separator}/>
+            <View key={`SEP_${sectionId}_${rowId}`} style={styles.separator} />
         );
     }
 
@@ -76,7 +77,7 @@ export default class MapList extends Component {
         this.setState({ activeItemId: null });
     }
 
-    _onRegionChange = location => {
+    _onRegionChange = (location) => {
         this.setState({ location });
         this.props.dispatch(setLocation(location));
     }
@@ -85,31 +86,31 @@ export default class MapList extends Component {
         return (
             <View style={styles.searchContainer}>
                 {this.state.listMode ? (
-                    <Icon name="arrow-back" style={styles.searchIcon} onPress={this._closeList}/>
+                    <Icon name="arrow-back" style={styles.searchIcon} onPress={this._closeList} />
                 ) : (
-                    <Icon name="menu"  style={styles.searchIcon}/>
+                    <Icon name="menu" style={styles.searchIcon} />
                 )}
                 <TextInput
-                    ref="search"
-                    placeholder="Search Coffee Shops"
-                    style={styles.search}
-                    onChangeText={this._onSearch}
-                    onFocus={this._openList}
+                  ref="search"
+                  placeholder="Search Coffee Shops"
+                  style={styles.search}
+                  onChangeText={this._onSearch}
+                  onFocus={this._openList}
                     // onBlur={this._checkSearchFocus}
-                    returnKeyType="search"
-                    value={this.state.query}
+                  returnKeyType="search"
+                  value={this.state.query}
                 />
             </View>
-        )
+        );
     }
 
     _renderMap() {
         return this.state.location ? (
             <View style={styles.mapContainer}>
                 <MapView
-                    region={this.state.location}
-                    onRegionChange={this._onRegionChange}
-                    style={styles.map}
+                  region={this.state.location}
+                  onRegionChange={this._onRegionChange}
+                  style={styles.map}
                 >
                     {this.state.items.map(this._renderMarker)}
                 </MapView>
@@ -120,16 +121,16 @@ export default class MapList extends Component {
     _renderMarker(rowData, idx) {
         const coordinate = {
             latitude: get(rowData, 'location.lat'),
-            longitude: get(rowData, 'location.lng')
+            longitude: get(rowData, 'location.lng'),
         };
         const { location } = rowData;
         return (
             <MapView.Marker
-                key={`map-marker-${idx}`}
-                coordinate={coordinate}
-                identified={rowData.id}
-                title={rowData.name}
-                description={`${location.address}, ${location.city}`}
+              key={`map-marker-${idx}`}
+              coordinate={coordinate}
+              identified={rowData.id}
+              title={rowData.name}
+              description={`${location.address}, ${location.city}`}
             />
             // @todo use custom callout view
         );
@@ -156,21 +157,22 @@ export default class MapList extends Component {
     _renderList() {
         return this.state.listMode ? (
             <ListView
-                dataSource={this.state.dataSource}
-                automaticallyAdjustContentInsets={false}
-                enableEmptySections
-                renderSeparator={this._renderSeparator}
-                renderRow={this._renderRow}
-                style={styles.list}
+              dataSource={this.state.dataSource}
+              automaticallyAdjustContentInsets={false}
+              enableEmptySections
+              renderSeparator={this._renderSeparator}
+              renderRow={this._renderRow}
+              style={styles.list}
             />
         ) : null;
     }
 
     _renderDetails() {
-        console.log('render details' ,this.state.detailsData);
+        console.log('render details', this.state.detailsData);
         return this.state.activeItemId ? (
             <Details style={styles.details} itemId={this.state.activeItemId}
-                onClose={this._onItemClose} />
+              onClose={this._onItemClose}
+            />
         ) : null;
     }
 
@@ -191,8 +193,9 @@ export default class MapList extends Component {
                     {this._renderMap()}
                     <View style={styles.currentLocation}>
                         <Icon name="location-searching"
-                            onPress={this._getCurrentLocation}
-                            size={20} color="#000" />
+                          onPress={this._getCurrentLocation}
+                          size={20} color="#000"
+                        />
                     </View>
                     {this._renderList()}
                     {this._renderDetails()}
@@ -207,14 +210,14 @@ MapList.propTypes = {
     items: PropTypes.array,
     location: PropTypes.object,
     error: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
 };
 
 MapList.defaultProps = {
     items: [],
     error: null,
     location: null,
-    dispatch() {}
+    dispatch() {},
 };
 
 function select(state) {

@@ -1,15 +1,28 @@
 {
-  "extends": ["airbnb", "plugin:react/recommended"],
+  "extends": [
+    "airbnb",
+    "plugin:react/recommended"
+  ],
   "plugins": [
     "react",
     "react-native"
   ],
+  "parser": "babel-eslint",
   "globals": {
-    "fetch": false
+    "fetch": false,
+    "navigator": false
   },
   "rules": {
     "indent": [2, 4, {"SwitchCase": 1}],
-    "comma-dangle": [1, "always-multiline"]
+    "comma-dangle": [1, "always-multiline"],
+    "react/no-unused-prop-types": 0,
+    "react/forbid-prop-types": 0,
+    "react/jsx-indent": [2, 4],
+    "react/jsx-indent-props": [2, 2],
+    "react/jsx-filename-extension": 0,
+    "react/jsx-first-prop-new-line": 0,
+    "no-shadow": 0,
+    "arrow-body-style": 0
   },
   "ecmaFeatures": {
     "jsx": true

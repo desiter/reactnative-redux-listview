@@ -1,16 +1,16 @@
-import * as types from './types';
 import { delay, get, sortBy } from 'lodash';
-import getVenue from '../services/foursquare/getVenue';
 import geo from 'geolib';
+import * as types from './types';
+import getVenue from '../services/foursquare/getVenue';
 
 export default function fetchDetails(id, region) {
-    return dispatch => {
+    return (dispatch) => {
         dispatch({ type: types.FETCH_DETAILS.START });
         getVenue(id)
-            .then(item => {
+            .then((item) => {
                 item.distance = Math.round(geo.getDistance(region, {
                     latitude: get(item, 'location.lat'),
-                    longitude: get(item, 'location.lng')
+                    longitude: get(item, 'location.lng'),
                 }));
                 return item;
             })

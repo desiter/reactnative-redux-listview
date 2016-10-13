@@ -7,8 +7,8 @@ export default class VenueHeader extends Component {
     constructor() {
         super();
         this.state = {
-            photoUrl: ''
-        }
+            photoUrl: '',
+        };
     }
 
     setNativeProps(nativeProps) {
@@ -54,10 +54,10 @@ export default class VenueHeader extends Component {
 VenueHeader.propTypes = {
     data: PropTypes.object,
     photoUrl: PropTypes.string,
-    onPress: PropTypes.func
+    onPress: PropTypes.func,
 };
 
 VenueHeader.defaultProps = {
     data: { name: 'Untitled' },
-    onPress: () => { }
+    onPress: () => { },
 };
